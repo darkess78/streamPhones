@@ -18,7 +18,7 @@ for /f "usebackq tokens=1,2 delims=," %%A in ("devices.txt") do (
 
 set /a deviceCount=count-1
 
-:: Export everything to parent context
+:: Export everything to parent
 (
     echo @echo off
     echo set deviceCount=%deviceCount%
