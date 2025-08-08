@@ -1,5 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
+
+::error checking to quit if there is the shutdown flag
 if exist shutdown.flag exit /b
 
 echo [%time%] monitor.bat started with args: %*
