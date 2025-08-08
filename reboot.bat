@@ -14,7 +14,7 @@ echo.
 for /L %%i in (1,1,%deviceCount%) do (
     call set "device=%%device%%i%%"
 
-    adb -s !device! reboot
+    scrcpy3.2\adb -s !device! reboot
 )
 
 pause

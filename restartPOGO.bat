@@ -17,8 +17,8 @@ for /L %%i in (1,1,%deviceCount%) do (
     echo Restarting Pokemon GO on device %%i: !device!
 
     :: Force close POGO and restart it with virtual touch input 
-    adb -s !device! shell am force-stop com.nianticlabs.pokemongo >nul 2>&1
-    adb -s !device! shell monkey -p com.nianticlabs.pokemongo -c android.intent.category.LAUNCHER 1 >nul 2>&1
+    scrcpy3.2\adb -s !device! shell am force-stop com.nianticlabs.pokemongo >nul 2>&1
+    scrcpy3.2\adb -s !device! shell monkey -p com.nianticlabs.pokemongo -c android.intent.category.LAUNCHER 1 >nul 2>&1
 )
 
 pause

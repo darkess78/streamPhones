@@ -14,7 +14,7 @@ echo.
 for /L %%i in (1,1,%deviceCount%) do (
     call set "device=%%device%%i%%"
 	REM adb -s !device! shell settings get system screen_brightness
-    adb -s !device! shell settings put system screen_brightness 0
+    scrcpy3.2\adb -s !device! shell settings put system screen_brightness 0
 )
 
 pause

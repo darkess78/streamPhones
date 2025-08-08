@@ -63,7 +63,7 @@ echo running > "%lockfile%"
 
 :main_monitor_loop
 :: Check scrcpy status and restart if needed
-adb -s %device% shell pidof com.android.shell:scrcpy >nul
+scrcpy3.2\adb -s %device% shell pidof com.android.shell:scrcpy >nul
 if errorlevel 1 (
 	if exist shutdown.flag (
 		echo Shutdown flag detected during loop. Exiting monitor...
@@ -84,12 +84,12 @@ if errorlevel 1 (
 )
 
 :: ADB reconnection logic if needed
-adb devices | findstr /i "%device%" >nul
+scrcpy3.2\adb devices | findstr /i "%device%" >nul
 if errorlevel 1 (
     echo Device %device% not found in ADB. Attempting reconnect...
-    adb connect %device%
+    scrcpy3.2\adb connect %device%
     timeout /t 2 >nul
-    adb devices | findstr /i "%device%" >nul
+    scrcpy3.2\adb devices | findstr /i "%device%" >nul
     if errorlevel 1 (
         echo Reconnect failed. Testing network reachability...
         powershell -Command "if ((Test-NetConnection -ComputerName %device::= % -Port %device:*:=% ).TcpTestSucceeded) { exit 0 } else { exit 1 }"
