@@ -11,9 +11,6 @@ for %%a in (%*) do (
     if "%%~a"=="--test" set "is_test=1"
 )
 
-:: Remove any file locks on start
-::del /f /q launch_*.lock >nul 2>&1
-
 :: Layout mode: 1=1080 top, 2=1440 main, 3=1080 main, 4=1080 right, 5=1440 right
 set /p windowInput=Enter (1 top monitor), (2 main 1440), (3 main 1080), (4 right 1080), (5 right 1440) or just enter for default: 
 if "%windowInput%"=="" set "windowInput=1"
@@ -44,7 +41,6 @@ if "%windowInput%"=="1" (
     set /a posy=2560
     set /a posx=30
 )
-
 ::2560 is 1.3333333 x 1920
 
 set "all_ids="
@@ -85,11 +81,11 @@ call set "posy%index%=%posy_current%"
 ::error checking to quit if there is no title or device
 if not defined title exit /b
 if not defined device exit /b
+if exist shutdown.flag exit /b
 
 :: Display info
 echo Launching %title% at %device% on %posx_current%, %posy_current%
 echo.
-
 :: Launch the monitor/scrcpy session
 call :launch_monitor "%title%" "%device%" %posx_current% %posy_current% "%all_ids%" updated_ids updated_titles
 set "all_ids=%updated_ids%"
@@ -121,10 +117,7 @@ set "all_ids=%~5"
 set "return_ids=%~6"
 set "return_titles=%~7"
 set "id=%rid%_%title%"
-
-::Set window height to a size depending on what monitor its on
-set /a windowOffset=%windowHeight * (1 + (1 / 3))
-set /a windowHeight=%windowOffset%
+set "windowHeight=%windowHeight%"
 
 :: Track all launched sessions
 echo !all_ids! | findstr /i "\<%id%\>" >nul
@@ -181,9 +174,6 @@ if "%userInput%"=="" call :loop %id% "%all_ids%"
 echo Invalid input: %userInput% - please enter Q or press Enter.
 timeout /t 2 >nul
 goto loop
-
-REM timeout /t 10 >nul
-REM goto loop
 
 :debug
 if "%DEBUG_MODE%"=="1" echo [DEBUG] %~1
