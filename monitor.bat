@@ -34,7 +34,8 @@ start "Monitor %id%" /min cmd /k call "%~f0" %device% %title% %posx% %posy% %id%
 goto :eof
 
 :monitor
-
+:: Immediately exit if shutdown flag is present
+if exist shutdown.flag exit /b
 :: Prevent relaunch if lock exists
 set "lockfile=launch_%id%.lock"
 if exist "%lockfile%" (

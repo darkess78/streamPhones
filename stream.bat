@@ -72,16 +72,9 @@ echo.
 call :launch_monitor "%title%" "%device%" %posx_current% %posy_current% "%all_ids%" updated_ids updated_titles
 set "all_ids=%updated_ids%"
 set "all_monitor_titles=%updated_titles%"
-
-:init_device_vars_after
-:: Skip any remaining lines after rejoining
 exit /b
 
 :launch_monitor
-if exist shutdown.flag (
-    echo Skipping monitor launch for !id! due to shutdown.
-    exit /b
-)
 :: %1 = title
 :: %2 = device
 :: %3 = posx
@@ -90,8 +83,14 @@ if exist shutdown.flag (
 :: %6 = return var name for ids
 :: %7 = return var name for titles
 
-:: Assign arguments
 setlocal enabledelayedexpansion
+if exist shutdown.flag (
+    echo Skipping monitor launch due to shutdown.
+    endlocal
+    exit /b
+)
+
+:: Assign arguments
 set "title=%~1"
 set "device=%~2"
 set "posx=%~3"
@@ -147,7 +146,7 @@ if /i "%userInput%"=="Q" (
 	echo Shutting Down...
 	echo Id = %id%
 	echo all_ids = %all_ids%
-	start "Shutdown %id%" /min cmd /c "call shutdownStream.bat \"%id%\" \"%all_ids%\""
+	start "Shutdown %id%" /min cmd /c "call shutdownStream.bat "%id%" "%all_ids%""
 	goto :eof
 )
 

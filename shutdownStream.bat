@@ -11,15 +11,31 @@ echo shutdown > shutdown.flag
 set "id=%~1"
 set "all_ids=%~2"
 
+:: Terminate scrcpy if still running
+tasklist /fi "imagename eq scrcpy.exe" | find /i "scrcpy.exe" >nul
+if not errorlevel 1 (
+	echo Terminating scrcpy processes...
+	taskkill /f /im scrcpy.exe >nul 2>&1
+)
+
+echo Progress 10%
 :: Kill CMD windows launched for this session
-for %%i in (!all_ids!) do (
-    echo Killing Monitor %%i >> shutdown.log
-    for /f "tokens=2 delims=," %%p in ('tasklist /v /fo csv ^| findstr /i /c:"\"cmd.exe\"" ^| findstr /r /c:"\"Monitor %%i\"$"') do (
-        echo Taskkill for PID: %%p >> shutdown.log
-        taskkill /f /pid %%p >nul 2>&1
+REM for %%i in (!all_ids!) do (
+    REM echo Killing Monitor %%i >> shutdown.log
+    REM for /f "tokens=2 delims=," %%p in ('tasklist /v /fo csv ^| findstr /i /c:"\"cmd.exe\"" ^| findstr /r /c:"\"Monitor %%i\"$"') do (
+        REM echo Taskkill for PID: %%p >> shutdown.log
+        REM taskkill /f /pid %%p >nul 2>&1
+    REM )
+REM )
+
+for %%i in (%all_ids%) do (
+    for /f "tokens=*" %%p in ('powershell -command "Get-Process | Where-Object { $_.MainWindowTitle -eq \"Monitor %%i\" -and $_.ProcessName -eq 'cmd' } | Select-Object -ExpandProperty Id"') do (
+        echo Killing Monitor "Monitor %%i" with PID %%p >> shutdown.log
+        taskkill /PID %%p /F
     )
 )
 
+echo Progress 50%
 :: Terminate scrcpy if still running
 tasklist /fi "imagename eq scrcpy.exe" | find /i "scrcpy.exe" >nul
 if not errorlevel 1 (
@@ -29,6 +45,7 @@ if not errorlevel 1 (
 
 timeout /t 1 >nul
 
+echo Progres 90%
 :: Clean up temporary files
 echo Cleaning up temp scripts...
 for %%i in (%id%) do (

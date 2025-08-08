@@ -1,3 +1,5 @@
-[ 0:21:45.23] shutdownStream.bat started with args: \"672310\" \" 672310_Pixel2XL 672310_Pixel3XL 672310_Note20Ultra\" 
-Killing Monitor \" 672310_Pixel2XL 672310_Pixel3XL 672310_Note20Ultra\" 
-[ 0:22:11.19] Finished shutdown. 
+[ 1:02:57.78] shutdownStream.bat started with args: "1617258" " 1617258_Pixel2XL 1617258_Pixel3XL 1617258_Note20Ultra" 
+Killing Monitor "Monitor 1617258_Pixel2XL" with PID 21980 
+Killing Monitor "Monitor 1617258_Pixel3XL" with PID 32372 
+Killing Monitor "Monitor 1617258_Note20Ultra" with PID 2540 
+[ 1:02:59.13] Finished shutdown. 
