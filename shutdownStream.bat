@@ -20,6 +20,7 @@ if not errorlevel 1 (
 
 echo Progress 10%
 :: Kill CMD windows launched for this session
+REM wasn't working fast enought to close monitor cmd windows and they would restart scrcpy
 REM for %%i in (!all_ids!) do (
     REM echo Killing Monitor %%i >> shutdown.log
     REM for /f "tokens=2 delims=," %%p in ('tasklist /v /fo csv ^| findstr /i /c:"\"cmd.exe\"" ^| findstr /r /c:"\"Monitor %%i\"$"') do (

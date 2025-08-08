@@ -15,7 +15,7 @@ for %%a in (%*) do (
 ::del /f /q launch_*.lock >nul 2>&1
 
 ::set /a window = 1
-set /a windowHeight =(1000*(1+(1/3)))
+set windowHeight = 1080
 ::2560 is 1.3333333 x 1920
 
 ::Default posy should be -1050 for 3rd monitor or 30 for main
@@ -99,7 +99,10 @@ set "all_ids=%~5"
 set "return_ids=%~6"
 set "return_titles=%~7"
 set "id=%rid%_%title%"
-set "windowHeight=%windowHeight%"
+
+::Set window height to a size depending on what monitor its on
+set /a windowOffset=%windowHeight * (1 + (1 / 3))
+set /a windowHeight=%windowOffset%
 
 :: Track all launched sessions
 echo !all_ids! | findstr /i "\<%id%\>" >nul
@@ -138,14 +141,14 @@ echo.
 echo Monitoring device connections... (ADB + Scrcpy in one window, Monitor is on another)
 echo.
 
-echo [loop] all_ids: %all_ids%
+call :debug "[loop] all_ids: %all_ids%"
 :: Await user input to quit
 set /p userInput=Enter Q to quit (or press Enter to keep monitoring):
 
 if /i "%userInput%"=="Q" (
 	echo Shutting Down...
-	echo Id = %id%
-	echo all_ids = %all_ids%
+	call :debug "Id = %id%"
+	call :debug "all_ids = %all_ids%"
 	start "Shutdown %id%" /min cmd /c "call shutdownStream.bat "%id%" "%all_ids%""
 	goto :eof
 )
