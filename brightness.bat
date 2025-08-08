@@ -10,7 +10,7 @@ for /L %%i in (1,1,%deviceCount%) do (
 
 echo.
 
-:: Now restart Pokémon GO on each device
+:: Set device screen brightness to 0
 for /L %%i in (1,1,%deviceCount%) do (
     call set "device=%%device%%i%%"
 	REM adb -s !device! shell settings get system screen_brightness
