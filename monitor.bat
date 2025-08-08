@@ -51,7 +51,7 @@ echo running > "%lockfile%"
 adb -s %device% shell pidof com.android.shell:scrcpy >nul
 if errorlevel 1 (
     echo %title% scrcpy not running. Launching...
-	scrcpy -s %device% --window-title="%title%" --window-x=%posx% --window-y=%posy% --window-width=640 --window-height=%window-height% --no-audio 2>> nul 2>&1
+	scrcpy3.2\scrcpy -s %device% --window-title="%title%" --window-x=%posx% --window-y=%posy% --window-width=640 --window-height=%window-height% --no-audio 2>> nul 2>&1
     timeout /t 1 >nul
 ) else (
     echo %title% scrcpy already running. Skipping launch.
