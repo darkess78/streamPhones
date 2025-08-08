@@ -39,13 +39,12 @@ call :debug "Random ID for this run: %rid%"
 for /L %%i in (1,1,%deviceCount%) do (
     call :init_device_vars %%i
 )
-call :loop %rid% "!all_ids!"
+call :loop %rid% "%all_ids%"
 
 :init_device_vars
 :: %1 = device index
 if exist shutdown.flag exit /b
 
-setlocal enabledelayedexpansion
 set "index=%1"
 
 :: Load device and title
@@ -61,24 +60,18 @@ set /a posy_current=%posy%
 call set "posx%index%=%posx_current%"
 call set "posy%index%=%posy_current%"
 
-:: Assign to common vars
-call set "posx=%%posx%index%%%"
-call set "posy=%%posy%index%%%"
-
 ::error checking to quit if there is no title or device
 if not defined title exit /b
 if not defined device exit /b
 
 :: Display info
-echo Launching !title! at !device! on !posx!, !posy!
+echo Launching %title% at %device% on %posx_current%, %posy_current%
 echo.
 
 :: Launch the monitor/scrcpy session
-call :launch_monitor "!title!" "!device!" !posx! !posy! "!all_ids!" updated_ids updated_titles
-endlocal & (
-    set "all_ids=!updated_ids!"
-    set "all_monitor_titles=!updated_titles!"
-)
+call :launch_monitor "%title%" "%device%" %posx_current% %posy_current% "%all_ids%" updated_ids updated_titles
+set "all_ids=%updated_ids%"
+set "all_monitor_titles=%updated_titles%"
 
 :init_device_vars_after
 :: Skip any remaining lines after rejoining
@@ -146,7 +139,7 @@ echo.
 echo Monitoring device connections... (ADB + Scrcpy in one window, Monitor is on another)
 echo.
 
-echo [loop] all_ids: !all_ids!
+echo [loop] all_ids: %all_ids%
 :: Await user input to quit
 set /p userInput=Enter Q to quit (or press Enter to keep monitoring):
 
@@ -154,12 +147,12 @@ if /i "%userInput%"=="Q" (
 	echo Shutting Down...
 	echo Id = %id%
 	echo all_ids = %all_ids%
-	start "Shutdown !id!" /min cmd /c "call shutdownStream.bat \"!id!\" \"!all_ids!\""
+	start "Shutdown %id%" /min cmd /c "call shutdownStream.bat \"%id%\" \"%all_ids%\""
 	goto :eof
 )
 
 :: If blank input, reloop
-if "%userInput%"=="" call :loop %id% "!all_ids!"
+if "%userInput%"=="" call :loop %id% "%all_ids%"
 
 echo Invalid input: %userInput% - please enter Q or press Enter.
 timeout /t 2 >nul
@@ -169,5 +162,5 @@ REM timeout /t 10 >nul
 REM goto loop
 
 :debug
-if "!DEBUG_MODE!"=="1" echo [DEBUG] %~1
+if "%DEBUG_MODE%"=="1" echo [DEBUG] %~1
 exit /b
