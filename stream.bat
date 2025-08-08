@@ -8,11 +8,22 @@ if exist shutdown.flag exit /b
 set "DEBUG_MODE=0"
 set "is_test=0"
 set "shutdown_triggered=0"
+
+:: Load device list from external file
+call load_devices.bat
 :: Loop through all command-line arguments
 for %%a in (%*) do (
     if "%%~a"=="--debug" set "DEBUG_MODE=1"
     if "%%~a"=="--test" set "is_test=1"
 )
+
+set /p selectedDevices=Enter device numbers to launch (1 to %deviceCount%, separated by commas, enter for all): 
+if "%selectedDevices%"=="" (
+    for /L %%i in (1,1,%deviceCount%) do (
+        set "selectedDevices=!selectedDevices! %%i"
+    )
+)
+set "selectedDevices=%selectedDevices:,= %"
 
 set /p windowInput=Enter (1 top monitor), (2 main 1440), (3 main 1080), (4 right 1080), (5 right 1440) or just enter for default: 
 if "%windowInput%"=="" set "windowInput=1"
@@ -48,21 +59,19 @@ if "%windowInput%"=="1" (
 set "all_ids="
 set "all_monitor_titles="
 
-:: Load device list from external file
-call load_devices.bat
-
 :: Generate a session-specific random ID
 set /a rid=%random% * 100 + %random%
 call :debug "Random ID for this run: %rid%"
 
 :: Launch each device with a unique scrcpy window
-for /L %%i in (1,1,%deviceCount%) do (
+for %%i in (%selectedDevices%) do (
     call :init_device_vars %%i
     if "!shutdown_triggered!"=="1" (
         echo Shutdown triggered during init. Halting remaining launches.
         goto :after_launch_loop
     )
 )
+
 :after_launch_loop
 if "%shutdown_triggered%"=="1" (
     exit /b
