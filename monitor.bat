@@ -1,8 +1,11 @@
 @echo off
-setlocal enabledelayedexpansion
+:: Abort immediately if shutdown flag is found — even before setlocal
+if exist shutdown.flag (
+    echo Shutdown flag found before anything runs. Skipping monitor window.
+    exit /b
+)
 
-::error checking to quit if there is the shutdown flag
-if exist shutdown.flag exit /b
+setlocal enabledelayedexpansion
 
 echo [%time%] monitor.bat started with args: %*
 
@@ -29,6 +32,12 @@ if "%~5"=="" goto :eof
 :: Launch monitor mode if seventh argument is "monitor"
 if "%~7"=="monitor" goto monitor
 
+:: Check for shutdown before launching monitor window
+if exist shutdown.flag (
+    echo Shutdown flag found before launching monitor window. Skipping launch.
+    goto :eof
+)
+
 :: Launch a new minimized CMD window running this script in 'monitor' mode
 start "Monitor %id%" /min cmd /k call "%~f0" %device% %title% %posx% %posy% %id% %window-height% monitor
 
@@ -37,7 +46,11 @@ goto :eof
 
 :monitor
 :: Immediately exit if shutdown flag is present
-if exist shutdown.flag exit /b
+if exist shutdown.flag (
+    echo Shutdown flag found. Exiting...
+    exit /b
+)
+
 :: Prevent relaunch if lock exists
 set "lockfile=launch_%id%.lock"
 if exist "%lockfile%" (
@@ -52,7 +65,18 @@ echo running > "%lockfile%"
 :: Check scrcpy status and restart if needed
 adb -s %device% shell pidof com.android.shell:scrcpy >nul
 if errorlevel 1 (
+	if exist shutdown.flag (
+		echo Shutdown flag detected during loop. Exiting monitor...
+		del /f /q "%lockfile%" >nul 2>&1
+		exit /b
+	)
     echo %title% scrcpy not running. Launching...
+    :: Final shutdown check before scrcpy launch
+    if exist shutdown.flag (
+        echo Shutdown flag detected right before scrcpy launch. Exiting monitor...
+        del /f /q "%lockfile%" >nul 2>&1
+        exit /b
+    )
 	scrcpy3.2\scrcpy -s %device% --window-title="%title%" --window-x=%posx% --window-y=%posy% --window-width=640 --window-height=%window-height% --no-audio 2>> nul 2>&1
     timeout /t 1 >nul
 ) else (

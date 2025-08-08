@@ -1,2 +1,4 @@
 devices.txt
 shutdown.log
+*.lock
+*.flag

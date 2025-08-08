@@ -7,6 +7,7 @@ if exist shutdown.flag exit /b
 :: Check for flags
 set "DEBUG_MODE=0"
 set "is_test=0"
+set "shutdown_triggered=0"
 :: Loop through all command-line arguments
 for %%a in (%*) do (
     if "%%~a"=="--debug" set "DEBUG_MODE=1"
@@ -18,27 +19,27 @@ if "%windowInput%"=="" set "windowInput=1"
 
 if "%windowInput%"=="1" (
     :: top monitor
-    set /a windowHeight=1050
+    set /a windowHeight=1000
     set /a posy=-1050
     set /a posx=0
 ) else if "%windowInput%"=="2" (
     :: main monitor full size
-    set /a windowHeight=1410
+    set /a windowHeight=1360
     set /a posy=30
     set /a posx=0
 ) else if "%windowInput%"=="3" (
     :: main monitor 1080
-    set /a windowHeight=1050
+    set /a windowHeight=1000
     set /a posy=30
     set /a posx=0
 ) else if "%windowInput%"=="4" (
     :: right monitor 1080
-    set /a windowHeight=1050
+    set /a windowHeight=1000
     set /a posy=2560
     set /a posx=30
 ) else if "%windowInput%"=="5" (
     :: right monitor 1440
-    set /a windowHeight=1410
+    set /a windowHeight=1360
     set /a posy=2560
     set /a posx=30
 )
@@ -57,6 +58,14 @@ call :debug "Random ID for this run: %rid%"
 :: Launch each device with a unique scrcpy window
 for /L %%i in (1,1,%deviceCount%) do (
     call :init_device_vars %%i
+    if "!shutdown_triggered!"=="1" (
+        echo Shutdown triggered during init. Halting remaining launches.
+        goto :after_launch_loop
+    )
+)
+:after_launch_loop
+if "%shutdown_triggered%"=="1" (
+    exit /b
 )
 call :loop %rid% "%all_ids%"
 
@@ -65,7 +74,10 @@ call :loop %rid% "%all_ids%"
 set "index=%1"
 
 ::error checking to quit if there is the shutdown flag
-if exist shutdown.flag exit /b
+if exist shutdown.flag (
+	set "shutdown_triggered=1"
+	exit /b
+)
 
 :: Load device and title
 call set "device=%%device%index%%%"
@@ -83,7 +95,11 @@ call set "posy%index%=%posy_current%"
 ::error checking to quit if there is no title or device
 if not defined title exit /b
 if not defined device exit /b
-if exist shutdown.flag exit /b
+:: Do not relaunch monitor if shutdown.flag exists
+if exist shutdown.flag (
+    echo Skipping monitor launch for %title% due to shutdown flag.
+    exit /b
+)
 
 :: Display info
 echo Launching %title% at %device% on %posx_current%, %posy_current%
@@ -168,11 +184,18 @@ set /p userInput=Enter Q to quit (or press Enter to keep monitoring):
 
 if /i "%userInput%"=="Q" (
 	echo Shutting Down...
+
+	:: Immediately set shutdown flag before shutdownStream is launched
+	echo shutdown > shutdown.flag echo.
+
 	call :debug "Id = %id%"
 	call :debug "all_ids = %all_ids%"
+
 	start "Shutdown stream.bat %id%" /min cmd /c "call shutdownStream.bat "%id%" "%all_ids%""
-	goto :eof
+	timeout /t 1 >nul
+	exit /b
 )
+
 
 :: If blank input, reloop
 if "%userInput%"=="" call :loop %id% "%all_ids%"
