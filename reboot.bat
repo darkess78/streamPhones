@@ -10,7 +10,7 @@ for /L %%i in (1,1,%deviceCount%) do (
 
 echo.
 
-:: Now restart Pokémon GO on each device
+:: Now restart each device
 for /L %%i in (1,1,%deviceCount%) do (
     call set "device=%%device%%i%%"
 
