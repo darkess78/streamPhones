@@ -14,16 +14,38 @@ for %%a in (%*) do (
 :: Remove any file locks on start
 ::del /f /q launch_*.lock >nul 2>&1
 
-::set /a window = 1
-set windowHeight = 1080
+:: Layout mode: 1=1080 top, 2=1440 main, 3=1080 main, 4=1080 right, 5=1440 right
+set /p windowInput=Enter (1 top monitor), (2 main 1440), (3 main 1080), (4 right 1080), (5 right 1440) or just enter for default: 
+if "%windowInput%"=="" set "windowInput=1"
+
+if "%windowInput%"=="1" (
+    :: top monitor
+    set /a windowHeight=1080
+    set /a posy=-1050
+    set /a posx=0
+) else if "%windowInput%"=="2" (
+    :: main monitor full size
+    set /a windowHeight=1440
+    set /a posy=30
+    set /a posx=0
+) else if "%windowInput%"=="3" (
+    :: main monitor 1080
+    set /a windowHeight=1080
+    set /a posy=30
+    set /a posx=0
+) else if "%windowInput%"=="4" (
+    :: right monitor 1080
+    set /a windowHeight=1080
+    set /a posy=2560
+    set /a posx=30
+) else if "%windowInput%"=="5" (
+    :: right monitor 1440
+    set /a windowHeight=1440
+    set /a posy=2560
+    set /a posx=30
+)
+
 ::2560 is 1.3333333 x 1920
-
-::Default posy should be -1050 for 3rd monitor or 30 for main
-::set /a posy=-1050
-set /a posy=30
-
-set /a posx=0
-::set /a posx=2560
 
 set "all_ids="
 set "all_monitor_titles="
