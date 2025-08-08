@@ -1,4 +1,5 @@
 Computer-to-Phone Control
+
 This project automates the management and monitoring of multiple Android devices from a computer using ADB, scrcpy, and custom batch scripts. 
 
 It is built to support real-time streaming, connection monitoring, automatic reconnection, and device-specific window positioning. 
