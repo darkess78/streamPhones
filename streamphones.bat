@@ -1,3 +1,4 @@
+::Old testing version with hardcoded values for a bunch of stuff
 @echo off
 setlocal enabledelayedexpansion
 
