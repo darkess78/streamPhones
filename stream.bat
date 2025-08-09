@@ -24,9 +24,16 @@ if "%selectedDevices%"=="" (
     )
 )
 set "selectedDevices=%selectedDevices:,= %"
+echo.
 
 set /p windowInput=Enter (1 top monitor), (2 main 1440), (3 main 1080), (4 right 1080), (5 right 1440) or just enter for default: 
 if "%windowInput%"=="" set "windowInput=1"
+echo.
+
+::default values
+set /a posy=30
+set /a posx=0
+set /a windowHeight=1000
 
 if "%windowInput%"=="1" (
     :: top monitor
@@ -46,13 +53,13 @@ if "%windowInput%"=="1" (
 ) else if "%windowInput%"=="4" (
     :: right monitor 1080
     set /a windowHeight=1000
-    set /a posy=2560
-    set /a posx=30
+    set /a posy=30
+    set /a posx=2560
 ) else if "%windowInput%"=="5" (
     :: right monitor 1440
     set /a windowHeight=1360
-    set /a posy=2560
-    set /a posx=30
+    set /a posy=30
+    set /a posx=2560
 )
 ::2560 is 1.3333333 x 1920
 
